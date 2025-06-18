@@ -14,7 +14,7 @@ namespace Companies.API.Data
                 var db = serviceProvider.GetRequiredService<CompaniesContext>();
 
                 await db.Database.MigrateAsync();
-                if (await db.Company.AnyAsync())
+                if (await db.Companies.AnyAsync())
                 {
                     return; // Database has been seeded
                 }
@@ -27,7 +27,7 @@ namespace Companies.API.Data
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    throw new ArgumentException(ex.Message);
                 }
 
             }

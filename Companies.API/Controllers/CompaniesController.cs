@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Companies.API.Data;
 using Companies.API.Entities;
 using Companies.API.DTOs;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Companies.Shared.DTOs;
 
 namespace Companies.API.Controllers
 {
@@ -16,11 +19,13 @@ namespace Companies.API.Controllers
     public class CompaniesController : ControllerBase
     {
         private readonly CompaniesContext _context;
+        private readonly IMapper _mapper;
 
-        public CompaniesController(CompaniesContext context)
+        public CompaniesController(CompaniesContext context, IMapper mapper)
         {
             _context = context;
-        }
+            _mapper = mapper;
+        }                
 
         // GET: api/Companies
         [HttpGet]
@@ -28,29 +33,41 @@ namespace Companies.API.Controllers
         {
             //return await _context.Company.ToListAsync();
             //return await _context.Company.Include(c => c.Employees).ToListAsync();
-            var companies = _context.Company.Select(c => new CompanyDTO
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Address = c.Address,
-                Country = c.Country
-            });
+            //var companies = _context.Companies.Select(c => new CompanyDTO
+            //{
+            //    Id = c.Id,
+            //    Name = c.Name,
+            //    Address = c.Address,
+            //    Country = c.Country
+            //});
 
-            return Ok(await companies.ToListAsync());
+            var companies = await _context.Companies.ProjectTo<CompanyDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            return Ok(companies);
         }
 
         // GET: api/Companies/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Company>> GetCompany(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
         {
-            var company = await _context.Company.FindAsync(id);
+            var company = await _context.Companies.FindAsync(id);
 
             if (company == null)
             {
                 return NotFound();
             }
 
-            return company;
+            //var dto = new CompanyDTO
+            //{
+            //    Id = company.Id,
+            //    Name = company.Name,
+            //    Address = company.Address,
+            //    Country = company.Country
+            //};
+
+            var dto = _mapper.Map<CompanyDTO>(company);
+
+            return dto;
         }
 
         // PUT: api/Companies/5
@@ -87,25 +104,29 @@ namespace Companies.API.Controllers
         // POST: api/Companies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Company>> PostCompany(Company company)
+        public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
         {
-            _context.Company.Add(company);
+            var company = _mapper.Map<Company>(dto);
+
+            _context.Companies.Add(company);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCompany", new { id = company.Id }, company);
+            var createdCompany = _mapper.Map<CompanyDTO>(company);
+
+            return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, createdCompany);
         }
 
         // DELETE: api/Companies/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _context.Company.FindAsync(id);
+            var company = await _context.Companies.FindAsync(id);
             if (company == null)
             {
                 return NotFound();
             }
 
-            _context.Company.Remove(company);
+            _context.Companies.Remove(company);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -113,7 +134,7 @@ namespace Companies.API.Controllers
 
         private bool CompanyExists(int id)
         {
-            return _context.Company.Any(e => e.Id == id);
+            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }
