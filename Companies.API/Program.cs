@@ -13,6 +13,10 @@ namespace Companies.API
             builder.Services.AddDbContext<CompaniesContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("CompaniesContext") ?? throw new InvalidOperationException("Connection string 'CompaniesContext' not found.")));
 
+            builder.Services.AddControllers(configure => configure.ReturnHttpNotAcceptable = true)
+                .AddNewtonsoftJson();
+                //.AddXmlDataContractSerializerFormatters();
+
             // Add services to the container.
 
             builder.Services.AddControllers();

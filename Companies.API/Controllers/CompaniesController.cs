@@ -29,7 +29,7 @@ namespace Companies.API.Controllers
 
         // GET: api/Companies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompany()
+        public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompany(bool includeEmployees)
         {
             //return await _context.Company.ToListAsync();
             //return await _context.Company.Include(c => c.Employees).ToListAsync();
@@ -41,7 +41,9 @@ namespace Companies.API.Controllers
             //    Country = c.Country
             //});
 
-            var companies = await _context.Companies.ProjectTo<CompanyDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            //var companies = await _context.Companies.ProjectTo<CompanyDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.Include(c => c.Employees).ToListAsync())
+                                             : _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.ToListAsync());
 
             return Ok(companies);
         }
@@ -88,9 +90,6 @@ namespace Companies.API.Controllers
 
             _mapper.Map(dto, existingCompany);
             await _context.SaveChangesAsync();
-
-
-
 
             return NoContent();
         }
