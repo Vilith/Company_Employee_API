@@ -101,12 +101,18 @@ namespace Companies.API.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        public async Task<IActionResult> DeleteEmployee(int id, int companyId)
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var companyExists = await _context.Companies.AnyAsync(c => c.Id.Equals(companyId));
+            if (!companyExists)
+            {
+                return NotFound($"Company with ID {companyId} not found.");
+            }
+
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id.Equals(id) && e.CompanyId.Equals(companyId));
             if (employee == null)
             {
-                return NotFound();
+                return NotFound("Employee not found");
             }
 
             _context.Employees.Remove(employee);
