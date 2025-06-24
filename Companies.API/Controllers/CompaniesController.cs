@@ -11,6 +11,7 @@ using Companies.API.DTOs;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Companies.Shared.DTOs;
+using Companies.API.Services;
 
 namespace Companies.API.Controllers
 {
@@ -18,13 +19,17 @@ namespace Companies.API.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private readonly CompaniesContext _context;
+        //private readonly CompaniesContext _context;
         private readonly IMapper _mapper;
+        private readonly IUoW _uoW;
+        //private readonly ICompanyRepository _companyRepo;
 
-        public CompaniesController(CompaniesContext context, IMapper mapper)
+        public CompaniesController(IMapper mapper, IUoW uoW)
         {
-            _context = context;
+            //_context = context;
             _mapper = mapper;
+            _uoW = uoW;
+            //_companyRepo = companyRepo;
         }                
 
         // GET: api/Companies
@@ -42,17 +47,20 @@ namespace Companies.API.Controllers
             //});
 
             //var companies = await _context.Companies.ProjectTo<CompanyDTO>(_mapper.ConfigurationProvider).ToListAsync();
-            var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.Include(c => c.Employees).ToListAsync())
-                                             : _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.ToListAsync());
+            //var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.Include(c => c.Employees).ToListAsync())
+                                             //: _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.ToListAsync());
+
+            var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync(true))
+                                             : _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync());
 
             return Ok(companies);
-        }
+        }             
 
         // GET: api/Companies/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
 
             if (company == null)
             {
@@ -82,14 +90,14 @@ namespace Companies.API.Controllers
                 return BadRequest();
             }
             
-            var existingCompany = await _context.Companies.FindAsync(id);
+            var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id);
             if (existingCompany == null)
             {
                 return NotFound("Company doesn't exist");
             }
 
             _mapper.Map(dto, existingCompany);
-            await _context.SaveChangesAsync();
+            await _uoW.CompleteAsync();
 
             return NoContent();
         }
@@ -100,9 +108,9 @@ namespace Companies.API.Controllers
         public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
         {
             var company = _mapper.Map<Company>(dto);
-
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
+                        
+            _uoW.CompanyRepository.Add(company);
+            await _uoW.CompleteAsync();
 
             var createdCompany = _mapper.Map<CompanyDTO>(company);
 
@@ -113,21 +121,17 @@ namespace Companies.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
             if (company == null)
             {
                 return NotFound("Company not found");
             }
 
-            _context.Companies.Remove(company);
-            await _context.SaveChangesAsync();
+            _uoW.CompanyRepository.Delete(company);
+            await _uoW.CompleteAsync();
 
             return NoContent();
-        }
 
-        private bool CompanyExists(int id)
-        {
-            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }
