@@ -13,7 +13,7 @@ namespace Companies.API.Data
                 .ForMember(dest => dest.Address, opt => opt.MapFrom
                 (src => $"{src.Address}{(string.IsNullOrEmpty(src.Country) ? string.Empty : ", ")}{src.Country}"));
 
-            CreateMap<Employee, EmployeeDTO>();
+            CreateMap<Employee, EmployeeDTO>().ReverseMap();
 
             CreateMap<CreateCompanyDTO, Company>();               
             CreateMap<UpdateCompanyDTO, Company>();
