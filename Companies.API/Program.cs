@@ -29,6 +29,18 @@ namespace Companies.API
             //builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
             builder.Services.AddScoped<IUoW, UoW>();
 
+
+            // Add CORS policy to allow all origins, headers, and methods
+            builder.Services.AddCors(builder => 
+            {
+                builder.AddPolicy("AllowAll", p =>
+                p.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+            });
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -40,6 +52,10 @@ namespace Companies.API
             }
 
             app.UseHttpsRedirection();
+
+            // Use the CORS policy defined above
+            app.UseCors("AllowAll");
+
 
             app.UseAuthorization();
 
