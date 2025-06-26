@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Companies.API.Data;
 using System.Threading.Tasks;
 using Companies.API.Services;
+using Companies.API.Extensions;
 
 namespace Companies.API
 {
@@ -31,13 +32,15 @@ namespace Companies.API
 
 
             // Add CORS policy to allow all origins, headers, and methods
-            builder.Services.AddCors(builder => 
-            {
-                builder.AddPolicy("AllowAll", p =>
-                p.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod());
-            });
+            //builder.Services.AddCors(builder => 
+            //{
+            //    builder.AddPolicy("AllowAll", p =>
+            //    p.AllowAnyOrigin()
+            //    .AllowAnyHeader()
+            //    .AllowAnyMethod());
+            //});
+
+            builder.Services.ConfigureCors(); // Use the extension method to configure CORS
 
 
 
