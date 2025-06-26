@@ -91,7 +91,7 @@ namespace Companies.API.Controllers
                 return BadRequest();
             }
             
-            var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id);
+            var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id, trackChanges: true);
             if (existingCompany == null)
             {
                 return NotFound("Company doesn't exist");
@@ -110,7 +110,7 @@ namespace Companies.API.Controllers
         {
             var company = _mapper.Map<Company>(dto);
                         
-            _uoW.CompanyRepository.Add(company);
+            _uoW.CompanyRepository.Create(company);
             await _uoW.CompleteAsync();
 
             var createdCompany = _mapper.Map<CompanyDTO>(company);

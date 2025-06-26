@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.17" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain.Models\Domain.Models.csproj" />
+  </ItemGroup>
+
 </Project>
