@@ -2,16 +2,16 @@
 
 #nullable disable
 
-namespace Companies.API.Migrations
+namespace Companies.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Finurligt : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Company",
+                name: "Companies",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -22,11 +22,11 @@ namespace Companies.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Company", x => x.Id);
+                    table.PrimaryKey("PK_Companies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employee",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -38,18 +38,18 @@ namespace Companies.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employee", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employee_Company_CompanyId",
+                        name: "FK_Employees_Companies_CompanyId",
                         column: x => x.CompanyId,
-                        principalTable: "Company",
+                        principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employee_CompanyId",
-                table: "Employee",
+                name: "IX_Employees_CompanyId",
+                table: "Employees",
                 column: "CompanyId");
         }
 
@@ -57,10 +57,10 @@ namespace Companies.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Employee");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Company");
+                name: "Companies");
         }
     }
 }

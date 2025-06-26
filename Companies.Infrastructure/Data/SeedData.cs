@@ -1,6 +1,8 @@
 ﻿using Bogus;
 using Companies.API.Entities;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Companies.API.Data
 {
