@@ -12,6 +12,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Companies.Shared.DTOs;
 using Companies.API.Services;
+using Companies.Infrastructure;
 
 namespace Companies.API.Controllers
 {

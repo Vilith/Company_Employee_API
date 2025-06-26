@@ -1,5 +1,6 @@
 ﻿using Companies.API.Entities;
 
+
 namespace Companies.API.Services
 {
     public interface ICompanyRepository
