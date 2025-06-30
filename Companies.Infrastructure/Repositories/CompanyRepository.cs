@@ -30,6 +30,11 @@ namespace Companies.API.Services
 
         }
 
+        public async Task<bool> CompanyExistAsync(int id)
+        {
+            return await Context.Companies.AnyAsync(c => c.Id.Equals(id));
+        }
+
         //public void Create(Company company)
         //{
         //    _context.Companies.Add(company);

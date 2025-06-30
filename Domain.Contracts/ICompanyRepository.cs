@@ -10,5 +10,7 @@ namespace Companies.API.Services
         void Create(Company company);
         void Delete(Company company);
         void Update(Company company);
+
+        Task<bool> CompanyExistAsync(int id);
     }
 }
