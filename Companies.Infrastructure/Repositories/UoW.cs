@@ -8,16 +8,21 @@ namespace Companies.API.Services
     {        
         private readonly CompaniesContext _context;
 
-        public ICompanyRepository CompanyRepository { get; }
-        public IEmployeeRepository EmployeeRepository { get; }
+        private readonly Lazy<ICompanyRepository> companyRepository;
+        private readonly Lazy<IEmployeeRepository> employeeRepository;
+
+        public ICompanyRepository CompanyRepository => companyRepository.Value;
+        public IEmployeeRepository EmployeeRepository => employeeRepository.Value;
 
         // Fler repos
 
         public UoW(CompaniesContext context)
         {
             _context = context;
-            CompanyRepository = new CompanyRepository(context);    
-            EmployeeRepository = new EmployeeRepository(context);
+            //CompanyRepository = new CompanyRepository(context);    
+            //EmployeeRepository = new EmployeeRepository(context);
+            companyRepository = new Lazy<ICompanyRepository>(() => new CompanyRepository(context));
+            employeeRepository = new Lazy<IEmployeeRepository>(() => new EmployeeRepository(context));
         }               
 
         public async Task CompleteAsync()

@@ -2,6 +2,8 @@
 using Companies.API.Data;
 using Companies.API.Services;
 using Companies.API.Extensions;
+using Services.Contracts;
+using Companies.Services;
 
 namespace Companies.API
 {
@@ -27,6 +29,7 @@ namespace Companies.API
 
             //builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
             builder.Services.AddScoped<IUoW, UoW>();
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
 
             // Add CORS policy to allow all origins, headers, and methods

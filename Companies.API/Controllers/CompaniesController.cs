@@ -13,6 +13,7 @@ using AutoMapper.QueryableExtensions;
 using Companies.Shared.DTOs;
 using Companies.API.Services;
 using Companies.Infrastructure;
+using Services.Contracts;
 
 namespace Companies.API.Controllers
 {
@@ -21,16 +22,15 @@ namespace Companies.API.Controllers
     public class CompaniesController : ControllerBase
     {
         //private readonly CompaniesContext _context;
-        private readonly IMapper _mapper;
-        private readonly IUoW _uoW;
+        //private readonly IMapper _mapper;
+        private readonly IServiceManager _serviceManager;
+
+        //private readonly IUoW _uoW;
         //private readonly ICompanyRepository _companyRepo;
 
-        public CompaniesController(IMapper mapper, IUoW uoW)
+        public CompaniesController(IServiceManager serviceManager)
         {
-            //_context = context;
-            _mapper = mapper;
-            _uoW = uoW;
-            //_companyRepo = companyRepo;
+            _serviceManager = serviceManager;          
         }                
 
         // GET: api/Companies
@@ -51,22 +51,25 @@ namespace Companies.API.Controllers
             //var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.Include(c => c.Employees).ToListAsync())
                                              //: _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.ToListAsync());
 
-            var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync(true))
-                                             : _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync());
+            //var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync(true))
+            //                                 : _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync());
 
-            return Ok(companies);
+            var companyDtos = await _serviceManager.CompanyService.GetCompaniesAsync(includeEmployees);
+
+            return Ok(companyDtos);
         }             
 
         // GET: api/Companies/5
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
         {
-            var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
+            //var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
 
-            if (company == null)
-            {
-                return NotFound();
-            }
+
+            //if (company == null)
+            //{
+            //    return NotFound();
+            //}
 
             //var dto = new CompanyDTO
             //{
@@ -76,63 +79,64 @@ namespace Companies.API.Controllers
             //    Country = company.Country
             //};
 
-            var dto = _mapper.Map<CompanyDTO>(company);
+            //var dto = _mapper.Map<CompanyDTO>(company);
+            CompanyDTO dto = await _serviceManager.CompanyService.GetCompanyAsync(id);
 
-            return dto;
+            return Ok(dto);
         }
 
         // PUT: api/Companies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompany(int id, UpdateCompanyDTO dto)
-        {
-            if (id != dto.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutCompany(int id, UpdateCompanyDTO dto)
+        //{
+        //    if (id != dto.Id)
+        //    {
+        //        return BadRequest();
+        //    }
             
-            var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id, trackChanges: true);
-            if (existingCompany == null)
-            {
-                return NotFound("Company doesn't exist");
-            }
+        //    var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id, trackChanges: true);
+        //    if (existingCompany == null)
+        //    {
+        //        return NotFound("Company doesn't exist");
+        //    }
 
-            _mapper.Map(dto, existingCompany);
-            await _uoW.CompleteAsync();
+        //    _mapper.Map(dto, existingCompany);
+        //    await _uoW.CompleteAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
-        // POST: api/Companies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
-        {
-            var company = _mapper.Map<Company>(dto);
+        //// POST: api/Companies
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
+        //{
+        //    var company = _mapper.Map<Company>(dto);
                         
-            _uoW.CompanyRepository.Create(company);
-            await _uoW.CompleteAsync();
+        //    _uoW.CompanyRepository.Create(company);
+        //    await _uoW.CompleteAsync();
 
-            var createdCompany = _mapper.Map<CompanyDTO>(company);
+        //    var createdCompany = _mapper.Map<CompanyDTO>(company);
 
-            return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, createdCompany);
-        }
+        //    return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, createdCompany);
+        //}
 
-        // DELETE: api/Companies/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCompany(int id)
-        {
-            var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
-            if (company == null)
-            {
-                return NotFound("Company not found");
-            }
+        //// DELETE: api/Companies/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteCompany(int id)
+        //{
+        //    var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
+        //    if (company == null)
+        //    {
+        //        return NotFound("Company not found");
+        //    }
 
-            _uoW.CompanyRepository.Delete(company);
-            await _uoW.CompleteAsync();
+        //    _uoW.CompanyRepository.Delete(company);
+        //    await _uoW.CompleteAsync();
 
-            return NoContent();
+        //    return NoContent();
 
-        }
+        //}
     }
 }
