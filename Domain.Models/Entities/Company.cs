@@ -16,7 +16,7 @@ namespace Companies.API.Entities
         public string? Country { get; set; }
 
         //Navigation property to the collection of Employees
-        public ICollection<Employee>? Employees { get; set; }
+        public ICollection<ApplicationUser>? Employees { get; set; }
 
     }
 }

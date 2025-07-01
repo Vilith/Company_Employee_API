@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Companies.API.Entities
 {
-    public class Employee
+    public class ApplicationUser : IdentityUser
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         [Required(ErrorMessage = "Age is a required field.")]
         public uint Age { get; set; }

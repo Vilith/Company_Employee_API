@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Companies.API.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Companies.API.Data
 {
-    public class CompaniesContext : DbContext
+    public class CompaniesContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public CompaniesContext (DbContextOptions<CompaniesContext> options)
             : base(options)
@@ -16,6 +18,6 @@ namespace Companies.API.Data
 
         //public DbSet<Company> Companies { get; set; } = default!;
         public DbSet<Company> Companies => Set<Company>();
-        public DbSet<Employee> Employees { get; set; } = default!;
+        //public DbSet<ApplicationUser> Employees { get; set; } = default!;
     }
 }

@@ -9,11 +9,11 @@ namespace Domain.Contracts
 {
     public interface IEmployeeRepository
     {
-        void Create(Employee employee);
-        void Update(Employee employee);
-        void Delete(Employee employee);
+        void Create(ApplicationUser employee);
+        void Update(ApplicationUser employee);
+        void Delete(ApplicationUser employee);
 
-        Task<IEnumerable<Employee>> GetEmployeesAsync(int companyId, bool trackChanges = false);
-        Task<Employee?> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges = false);
+        Task<IEnumerable<ApplicationUser>> GetEmployeesAsync(int companyId, bool trackChanges = false);
+        Task<ApplicationUser?> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges = false);
     }
 }

@@ -5,6 +5,8 @@ using Companies.API.Extensions;
 using Services.Contracts;
 using Companies.Services;
 using System.Reflection.Metadata;
+using Companies.API.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Companies.API
 {
@@ -38,6 +40,19 @@ namespace Companies.API
             builder.Services.ConfigureRepositories(); // Use the extension method to configure repositories
 
 
+            builder.Services.AddAuthentication();
+            builder.Services.AddIdentityCore<ApplicationUser>(opt =>
+            {
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireNonAlphanumeric = false;                
+                opt.Password.RequiredLength = 3;                
+            }
+            ).AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<CompaniesContext>()
+            .AddDefaultTokenProviders();
+
             // Add CORS policy to allow all origins, headers, and methods
             //builder.Services.AddCors(builder => 
             //{
@@ -65,7 +80,7 @@ namespace Companies.API
             // Use the CORS policy defined above
             app.UseCors("AllowAll");
 
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
