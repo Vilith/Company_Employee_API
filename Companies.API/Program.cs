@@ -4,6 +4,7 @@ using Companies.API.Services;
 using Companies.API.Extensions;
 using Services.Contracts;
 using Companies.Services;
+using System.Reflection.Metadata;
 
 namespace Companies.API
 {
@@ -18,7 +19,8 @@ namespace Companies.API
             // Add services to the container.
 
             builder.Services.AddControllers(configure => configure.ReturnHttpNotAcceptable = true)
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson()
+                .AddApplicationPart(typeof(AssemblyReference).Assembly);
             //.AddXmlDataContractSerializerFormatters();
 
             builder.Services.AddControllers();
@@ -28,8 +30,12 @@ namespace Companies.API
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
             //builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-            builder.Services.AddScoped<IUoW, UoW>();
-            builder.Services.AddScoped<IServiceManager, ServiceManager>();
+            //builder.Services.AddScoped<IUoW, UoW>();
+            //builder.Services.AddScoped<IServiceManager, ServiceManager>();
+
+
+            builder.Services.ConfigureServiceLayerServices(); // Use the extension method to configure service layer services
+            builder.Services.ConfigureRepositories(); // Use the extension method to configure repositories
 
 
             // Add CORS policy to allow all origins, headers, and methods
@@ -42,7 +48,6 @@ namespace Companies.API
             //});
 
             builder.Services.ConfigureCors(); // Use the extension method to configure CORS
-
 
 
             var app = builder.Build();
