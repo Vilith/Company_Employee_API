@@ -1,6 +1,5 @@
 ﻿using Companies.Shared.DTOs;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 
@@ -22,6 +21,19 @@ namespace Companies.Presentation.Controllers
         {
             var result = await _serviceManager.AuthService.RegisterUserAsync(registrationDTO);
             return result.Succeeded ? StatusCode(StatusCodes.Status201Created) : BadRequest(result.Errors);
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult> Authenticate(Companies.Shared.DTOs.UserForAuthDTO userForAuthDto)
+        {
+            if (!await _serviceManager.AuthService.ValidateUserAsync(userForAuthDto))
+            {
+                return Unauthorized();
+            }
+
+            var token = new { Token = "Lattjo Lajban" };
+            return Ok(token);
+
         }
 
     }

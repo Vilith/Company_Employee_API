@@ -7,6 +7,9 @@ using Companies.Services;
 using System.Reflection.Metadata;
 using Companies.API.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Companies.API
 {
@@ -40,14 +43,45 @@ namespace Companies.API
             builder.Services.ConfigureRepositories(); // Use the extension method to configure repositories
 
 
-            builder.Services.AddAuthentication();
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options => 
+            {
+                var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+                ArgumentNullException.ThrowIfNull(nameof(jwtSettings));
+
+                var secretKey = builder.Configuration["secretkey"];
+                ArgumentNullException.ThrowIfNull(secretKey, nameof(secretKey));
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+
+                    ValidateLifetime = true,                    
+                };
+            });
+
+
+
+
+
             builder.Services.AddIdentityCore<ApplicationUser>(opt =>
             {
                 // Configure password requirements
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireDigit = false;
-                opt.Password.RequireNonAlphanumeric = false;                
+                opt.Password.RequireNonAlphanumeric = false;
                 opt.Password.RequiredLength = 3;
                 // Configure user settings
                 opt.User.RequireUniqueEmail = true;

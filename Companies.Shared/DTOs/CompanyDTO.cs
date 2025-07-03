@@ -1,7 +1,7 @@
 ﻿using Companies.Shared.DTOs;
 using System.ComponentModel.DataAnnotations;
 
-namespace Companies.API.DTOs
+namespace Companies.Shared.DTOs
 {
     public record CompanyDTO
     {

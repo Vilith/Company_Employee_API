@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Companies.API.DTOs;
+
+using Companies.Shared.DTOs;
 using Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Companies.Presentation.Controllers
 {
@@ -48,6 +50,7 @@ namespace Companies.Presentation.Controllers
 
         // GET: api/Companies/5
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
         {
             //var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
