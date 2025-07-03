@@ -15,9 +15,10 @@ namespace Companies.Services
     {
         private readonly Lazy<ICompanyService> companyService;
         private readonly Lazy<IEmployeeService> employeeService;
-
+        private readonly Lazy<IAuthService> authService;
         public ICompanyService CompanyService => companyService.Value;
         public IEmployeeService EmployeeService => employeeService.Value;
+        public IAuthService AuthService => authService.Value;
 
         //public ServiceManager(IUoW uow, IMapper mapper)
         //{           
@@ -26,10 +27,11 @@ namespace Companies.Services
         //    companyService = new Lazy<ICompanyService>(() => new CompanyService(uow, mapper));
         //    employeeService = new Lazy<IEmployeeService>(() => new EmployeeService(uow, mapper));
         //}
-        public ServiceManager(Lazy<ICompanyService> companyservice, Lazy<IEmployeeService> employeeservice)
+        public ServiceManager(Lazy<ICompanyService> companyservice, Lazy<IEmployeeService> employeeservice, Lazy<IAuthService> authservice)
         {
             companyService = companyservice;
             employeeService = employeeservice;
+            authService = authservice;
         }
     }
 }

@@ -20,14 +20,17 @@ namespace Companies.API.Extensions
         }
 
         public static void ConfigureServiceLayerServices(this IServiceCollection services)
-        {            
-            services.AddScoped<IServiceManager, ServiceManager>();
-                        
+        {
+            // Scoped services are created once per request, which is suitable for web applications
+            services.AddScoped<IServiceManager, ServiceManager>();                        
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IAuthService, AuthService>();
             //services.AddScoped(provider => new Lazy<ICompanyService>(() => provider.GetRequiredService<ICompanyService>()));
+            // Lazy loading services
             services.AddLazy<ICompanyService>();
             services.AddLazy<IEmployeeService>();
+            services.AddLazy<IAuthService>();
         }
 
         public static void ConfigureRepositories(this IServiceCollection services)

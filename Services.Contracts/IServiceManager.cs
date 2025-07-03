@@ -10,6 +10,7 @@ namespace Services.Contracts
     {
         ICompanyService CompanyService { get; }
         IEmployeeService EmployeeService { get; }
+        IAuthService AuthService { get; }
         // Add other service properties as needed
     }
 }

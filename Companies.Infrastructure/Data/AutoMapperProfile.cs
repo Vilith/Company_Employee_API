@@ -18,6 +18,7 @@ namespace Companies.API.Data
             CreateMap<CreateCompanyDTO, Company>();               
             CreateMap<UpdateCompanyDTO, Company>();
             CreateMap<ApplicationUser, UpdateEmployeeDTO>().ReverseMap();
+            CreateMap<UserForRegistrationDTO, ApplicationUser>();
         }
     }
 }

@@ -43,11 +43,14 @@ namespace Companies.API
             builder.Services.AddAuthentication();
             builder.Services.AddIdentityCore<ApplicationUser>(opt =>
             {
+                // Configure password requirements
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireDigit = false;
                 opt.Password.RequireNonAlphanumeric = false;                
-                opt.Password.RequiredLength = 3;                
+                opt.Password.RequiredLength = 3;
+                // Configure user settings
+                opt.User.RequireUniqueEmail = true;
             }
             ).AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<CompaniesContext>()
