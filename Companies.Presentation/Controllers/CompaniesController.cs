@@ -1,75 +1,46 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 using Companies.Shared.DTOs;
 using Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Companies.API.Entities;
 
 namespace Companies.Presentation.Controllers
 {
     [Route("api/Companies")]
     [ApiController]
     public class CompaniesController : ControllerBase
-    {
-        //private readonly CompaniesContext _context;
-        //private readonly IMapper _mapper;
+    {      
         private readonly IServiceManager _serviceManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        //private readonly IUoW _uoW;
-        //private readonly ICompanyRepository _companyRepo;
-
-        public CompaniesController(IServiceManager serviceManager)
+        public CompaniesController(IServiceManager serviceManager, UserManager<ApplicationUser> userManager)
         {
-            _serviceManager = serviceManager;          
+            _serviceManager = serviceManager;
+            _userManager = userManager;
         }                
 
         // GET: api/Companies
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompany(bool includeEmployees)
         {
-            //return await _context.Company.ToListAsync();
-            //return await _context.Company.Include(c => c.Employees).ToListAsync();
-            //var companies = _context.Companies.Select(c => new CompanyDTO
-            //{
-            //    Id = c.Id,
-            //    Name = c.Name,
-            //    Address = c.Address,
-            //    Country = c.Country
-            //});
-
-            //var companies = await _context.Companies.ProjectTo<CompanyDTO>(_mapper.ConfigurationProvider).ToListAsync();
-            //var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.Include(c => c.Employees).ToListAsync())
-                                             //: _mapper.Map<IEnumerable<CompanyDTO>>(await _context.Companies.ToListAsync());
-
-            //var companies = includeEmployees ? _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync(true))
-            //                                 : _mapper.Map<IEnumerable<CompanyDTO>>(await _uoW.CompanyRepository.GetCompaniesAsync());
+            var auth = User.Identity!.IsAuthenticated;
+            var userName = _userManager.GetUserName(User);
+            var user = await _userManager.GetUserAsync(User);
 
             var companyDtos = await _serviceManager.CompanyService.GetCompaniesAsync(includeEmployees);
-
             return Ok(companyDtos);
         }             
 
         // GET: api/Companies/5
         [HttpGet("{id:int}")]
         [Authorize]
+        //[Authorize(Roles = "Admin")]
+        //[AllowAnonymous]        
+        //[Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<CompanyDTO>> GetCompany(int id)
-        {
-            //var company = await _uoW.CompanyRepository.GetCompanyAsync(id);
-
-
-            //if (company == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //var dto = new CompanyDTO
-            //{
-            //    Id = company.Id,
-            //    Name = company.Name,
-            //    Address = company.Address,
-            //    Country = company.Country
-            //};
-
-            //var dto = _mapper.Map<CompanyDTO>(company);
+        {            
             CompanyDTO dto = await _serviceManager.CompanyService.GetCompanyAsync(id);
 
             return Ok(dto);

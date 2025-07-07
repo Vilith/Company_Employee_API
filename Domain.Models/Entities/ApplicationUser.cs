@@ -19,7 +19,15 @@ namespace Companies.API.Entities
         public string? Position { get; set; }
         public int CompanyId { get; set; }
 
+
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpireTime { get; set; }
+
         // Navigation property to the Company entity
         public Company? Company { get; set; }
+
+        
+
+        
     }
 }

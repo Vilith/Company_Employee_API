@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Companies.API.Data;
-using Companies.API.Services;
 using Companies.API.Extensions;
-using Services.Contracts;
-using Companies.Services;
 using System.Reflection.Metadata;
 using Companies.API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using System.Security.Claims;
 
 namespace Companies.API
 {
@@ -21,12 +21,24 @@ namespace Companies.API
             builder.Services.AddDbContext<CompaniesContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("CompaniesContext") ?? throw new InvalidOperationException("Connection string 'CompaniesContext' not found.")));
 
+
             // Add services to the container.
 
-            builder.Services.AddControllers(configure => configure.ReturnHttpNotAcceptable = true)
-                .AddNewtonsoftJson()
-                .AddApplicationPart(typeof(AssemblyReference).Assembly);
+            builder.Services.AddControllers(configure =>
+            {
+                //configure.ReturnHttpNotAcceptable = true;
+                //// Everyone has to be Admins
+                //var policy = new AuthorizationPolicyBuilder()
+                //            .RequireAuthenticatedUser()
+                //            .RequireRole("Admin")
+                //            .Build();
+                //configure.Filters.Add(new AuthorizeFilter(policy));
+            })
+            .AddNewtonsoftJson()
+            .AddApplicationPart(typeof(AssemblyReference).Assembly);
             //.AddXmlDataContractSerializerFormatters();
+
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -39,37 +51,41 @@ namespace Companies.API
             //builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
 
+
             builder.Services.ConfigureServiceLayerServices(); // Use the extension method to configure service layer services
             builder.Services.ConfigureRepositories(); // Use the extension method to configure repositories
 
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(options => 
-            {
-                var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-                ArgumentNullException.ThrowIfNull(nameof(jwtSettings));
+            builder.Services.ConfigureJwt(builder.Configuration);
 
-                var secretKey = builder.Configuration["secretkey"];
-                ArgumentNullException.ThrowIfNull(secretKey, nameof(secretKey));
 
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["Issuer"],
+            //builder.Services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //})
+            //    .AddJwtBearer(options =>
+            //{
+            //    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            //    ArgumentNullException.ThrowIfNull(nameof(jwtSettings));
 
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings["Audience"],
+            //    var secretKey = builder.Configuration["secretkey"];
+            //    ArgumentNullException.ThrowIfNull(secretKey, nameof(secretKey));
 
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidIssuer = jwtSettings["Issuer"],
 
-                    ValidateLifetime = true,                    
-                };
-            });
+            //        ValidateAudience = true,
+            //        ValidAudience = jwtSettings["Audience"],
+
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+
+            //        ValidateLifetime = true,
+            //    };
+            //});
 
 
 
@@ -90,6 +106,19 @@ namespace Companies.API
             .AddEntityFrameworkStores<CompaniesContext>()
             .AddDefaultTokenProviders();
 
+            //builder.Services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("AdminPolicy", policy =>
+            //    policy.RequireRole("Admin")
+            //          .RequireClaim(ClaimTypes.NameIdentifier)
+            //          .RequireClaim(ClaimTypes.Role));
+
+            //    options.AddPolicy("EmployeePolicy", policy =>
+            //    policy.RequireRole("Employee"));
+            //});
+
+
+
             // Add CORS policy to allow all origins, headers, and methods
             //builder.Services.AddCors(builder => 
             //{
@@ -103,6 +132,10 @@ namespace Companies.API
 
 
             var app = builder.Build();
+
+
+            app.ConfigureExceptionHandler();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

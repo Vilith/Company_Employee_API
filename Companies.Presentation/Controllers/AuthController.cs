@@ -31,7 +31,8 @@ namespace Companies.Presentation.Controllers
                 return Unauthorized();
             }
 
-            var token = new { Token = "Lattjo Lajban" };
+            //var token = new { Token = "Lattjo Lajban" };
+            TokenDTO token = await _serviceManager.AuthService.CreateTokenAsync(expireTime: true);
             return Ok(token);
 
         }

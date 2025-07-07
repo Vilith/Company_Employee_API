@@ -38,9 +38,9 @@ namespace Companies.API.Data
                     await CreateRolesAsync(new[] { adminRole, employeeRole });
 
 
-                    var companies = GenerateCompanies(4);
+                    var companies = GenerateCompanies(30);
                     db.AddRange(companies);
-                    await GenerateEmployeesAsync(30, companies);
+                    await GenerateEmployeesAsync(300, companies);
 
                     await db.SaveChangesAsync();
                 }

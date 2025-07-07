@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Services.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Companies.Services
@@ -18,7 +19,7 @@ namespace Companies.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         
-        private ApplicationUser? user;
+        private ApplicationUser? _user;
 
         public AuthService(IMapper mapper, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration config)
         {
@@ -28,13 +29,44 @@ namespace Companies.Services
             _roleManager = roleManager;
         }
 
-        public async Task<string> CreateTokenAsync()
+        //public async Task<string> CreateTokenAsync(bool expireTime)
+        //{
+        //    SigningCredentials signing = GetSigningCredentials();
+        //    IEnumerable<Claim> claims = await GetClaimsAsync();
+        //    JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims);
+
+        //    return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        //}
+
+
+        public async Task<TokenDTO> CreateTokenAsync(bool expireTime)
         {
+            ArgumentNullException.ThrowIfNull(nameof(_user));
             SigningCredentials signing = GetSigningCredentials();
             IEnumerable<Claim> claims = await GetClaimsAsync();
             JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims);
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            _user!.RefreshToken = GenerateRefreshToken();
+
+            if (expireTime)
+            {
+                _user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(7); 
+            }
+
+            var res = await _userManager.UpdateAsync(_user); // Validating res
+
+            var accesstoken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            return new TokenDTO(accesstoken, _user.RefreshToken!);
+        }
+
+        private string? GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+
+            return Convert.ToBase64String(randomNumber);
         }
 
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signing, IEnumerable<Claim> claims)
@@ -54,14 +86,15 @@ namespace Companies.Services
 
         private async Task<IEnumerable<Claim>> GetClaimsAsync()
         {
-            ArgumentNullException.ThrowIfNull(nameof(user));
+            ArgumentNullException.ThrowIfNull(nameof(_user));
             var claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("Age", user.Age.ToString())
+                new Claim(ClaimTypes.Name, _user.UserName),
+                new Claim("Age", _user.Age.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, _user.Id)
             };
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(_user);
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -114,8 +147,61 @@ namespace Companies.Services
                 throw new ArgumentNullException(nameof(userForAuthDto));
             }
 
-            user = await _userManager.FindByNameAsync(userForAuthDto.UserName);
-            return user != null && await _userManager.CheckPasswordAsync(user, userForAuthDto.PassWord);
+            _user = await _userManager.FindByNameAsync(userForAuthDto.UserName);
+            return _user != null && await _userManager.CheckPasswordAsync(_user, userForAuthDto.PassWord);
+        }
+
+        public async Task<TokenDTO> RefreshTokenAsync(TokenDTO token)
+        {
+            ClaimsPrincipal principal = GetPrincipalFromExpiredToken(token.AccessToken);
+
+            ApplicationUser? user = await _userManager.FindByNameAsync(principal.Identity?.Name!);
+
+            if (user == null || user.RefreshToken != token.RefreshToken || user.RefreshTokenExpireTime <= DateTime.UtcNow)
+            {
+                throw new ArgumentException("The TokenDTO has some invalid values");
+            }
+                _user = user;
+
+            return await CreateTokenAsync(expireTime: false);
+
+            
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
+        {
+            var jwtSettings = _config.GetSection("JwtSettings");
+            ArgumentNullException.ThrowIfNull(nameof(jwtSettings));
+
+            var secretKey = _config["secretkey"];
+            ArgumentNullException.ThrowIfNull(nameof(secretKey));
+
+            var tokenValidationParams = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings["Issuer"],
+
+                ValidateAudience = true,
+                ValidAudience = jwtSettings["Audience"],
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+
+                ValidateLifetime = false // Changes to false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            ClaimsPrincipal principal = tokenHandler.ValidateToken(accessToken, tokenValidationParams, out SecurityToken securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            return principal;
+
         }
     }
+    
 }
