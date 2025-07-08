@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Domain.Models.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,9 +19,34 @@ namespace Companies.API.Extensions
                     {
                         var problemDetailsFactory = app.Services.GetService<ProblemDetailsFactory>();
                         ArgumentNullException.ThrowIfNull(nameof(ProblemDetailsFactory));
+
+                        var problemDetails = CreatedProblemDetails(context, contextFeatures.Error, problemDetailsFactory, app);
+
+                        context.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError; 
+                        await context.Response.WriteAsJsonAsync(problemDetails);
                     }
                 });
             });
+        }
+
+        private static ProblemDetails CreatedProblemDetails(HttpContext context, Exception error, ProblemDetailsFactory? problemDetailsFactory, WebApplication app)
+        {
+            return error switch
+            {
+                CompanyNotFoundException companyNotFoundException => problemDetailsFactory.CreateProblemDetails(
+                    context,
+                    StatusCodes.Status404NotFound,
+                    title: companyNotFoundException.Title,
+                    detail: companyNotFoundException.Message,
+                    instance: context.Request.Path),
+
+                _ => problemDetailsFactory.CreateProblemDetails(
+                    context,
+                    StatusCodes.Status500InternalServerError,
+                    title: "Internal Server Error",
+                    detail: app.Environment.IsDevelopment() ? error.Message : "An Unexpected error occurred")
+
+            };
         }
     }
 }

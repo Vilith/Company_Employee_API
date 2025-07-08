@@ -5,6 +5,7 @@ using Domain.Contracts;
 using Domain.Models.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Services.Contracts;
 using System.Text;
 
@@ -26,7 +27,7 @@ namespace Companies.API.Extensions
         public static void ConfigureServiceLayerServices(this IServiceCollection services)
         {
             // Scoped services are created once per request, which is suitable for web applications
-            services.AddScoped<IServiceManager, ServiceManager>();                        
+            services.AddScoped<IServiceManager, ServiceManager>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IAuthService, AuthService>();
@@ -36,6 +37,37 @@ namespace Companies.API.Extensions
             services.AddLazy<IEmployeeService>();
             services.AddLazy<IAuthService>();
         }
+
+        // Swagger with tokens
+        public static void ConfigureOpenApi(this IServiceCollection services) =>
+            services.AddEndpointsApiExplorer()
+            .AddSwaggerGen(setup =>
+            {
+                setup.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer"
+                });
+
+                setup.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
+            });
+
 
         public static void ConfigureRepositories(this IServiceCollection services)
         {
@@ -96,7 +128,7 @@ namespace Companies.API.Extensions
     {
         public static IServiceCollection AddLazy<TService>(this IServiceCollection services) where TService : class
         {
-            return services.AddScoped(provider => new Lazy<TService>(() => provider.GetRequiredService<TService>()));            
+            return services.AddScoped(provider => new Lazy<TService>(() => provider.GetRequiredService<TService>()));
         }
     }
 }

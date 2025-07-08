@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Companies.API.Services;
+using Companies.Shared.DTOs;
+using Domain.Models.Responses;
 using Services.Contracts;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,22 @@ namespace Companies.Services
         {
             _uow = uow;
             _mapper = mapper;
+        }
+
+        public async Task<ApiBaseResponse> GetEmployeesAsync(int companyID)
+        {
+            var companyExist = await _uow.CompanyRepository.CompanyExistAsync(companyID);
+
+            if (!companyExist)
+            {
+                return new CompanyNotFoundResponse(companyID);
+            }
+
+            var employees = await _uow.EmployeeRepository.GetEmployeesAsync(companyID);
+            
+            var employeesDtos = _mapper.Map<IEnumerable<EmployeeDTO>>(employees);
+
+            return new ApiOkResponse<IEnumerable<EmployeeDTO>>(employeesDtos);
         }
     }
 }
