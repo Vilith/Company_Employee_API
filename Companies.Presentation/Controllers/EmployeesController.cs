@@ -2,7 +2,7 @@
 using Companies.Shared.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
-using Companies.API.Services;
+using Domain.Contracts;
 using Domain.Models.Responses;
 using Services.Contracts;
 
@@ -110,15 +110,13 @@ namespace Companies.Presentation.Controllers
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id, int companyId)
-        {
-            //var companyExists = await _context.Companies.AnyAsync(c => c.Id.Equals(companyId));
+        {            
             var companyExists = await _uow.CompanyRepository.CompanyExistAsync(companyId);
             if (!companyExists)
             {
                 return NotFound($"Company with ID {companyId} not found.");
             }
-
-            //var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id.Equals(id) && e.CompanyId.Equals(companyId));
+                     
             var employee = await _uow.EmployeeRepository.GetEmployeeAsync(companyId, id);
 
 
@@ -127,8 +125,6 @@ namespace Companies.Presentation.Controllers
                 return NotFound("Employee not found");
             }
 
-            //_context.Employees.Remove(employee);            
-            //await _context.SaveChangesAsync();
             _uow.EmployeeRepository.Delete(employee);
             await _uow.CompleteAsync();
 
@@ -139,35 +135,28 @@ namespace Companies.Presentation.Controllers
         public async Task<ActionResult> PatchEmployee(int id, int companyId, JsonPatchDocument<UpdateEmployeeDTO> patchDocument)
         {
             if (patchDocument == null) return BadRequest("No patchdocument");
-            
-            //var companyExists = await _context.Companies.AnyAsync(c => c.Id.Equals(companyId));
+                        
             var companyExists = await _uow.CompanyRepository.CompanyExistAsync(companyId);  
             if (!companyExists) 
                 return NotFound($"Company with ID {companyId} not found.");
-
-            //var employeeToPatch = await _context.Employees.FirstOrDefaultAsync(e => e.Id.Equals(id) && e.CompanyId.Equals(companyId));
+                        
             var employeeToPatch = await _uow.EmployeeRepository.GetEmployeeAsync(companyId, id, trackChanges: true);
             if (employeeToPatch == null) 
                 return NotFound("Employee not found");
 
             var dto = _mapper.Map<UpdateEmployeeDTO>(employeeToPatch);
-            patchDocument.ApplyTo(dto, ModelState); // This is where the dto is patched with the patchDocument
+            //patchDocument.ApplyTo(dto, ModelState); // This is where the dto is patched with the patchDocument
             TryValidateModel(dto);
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
+            {
                 return UnprocessableEntity(ModelState);
+            }
 
-            _mapper.Map(dto, employeeToPatch);
-            //await _context.SaveChangesAsync();
+            _mapper.Map(dto, employeeToPatch);            
             await _uow.CompleteAsync();
 
             return NoContent();
-
-        }
-
-        //private bool EmployeeExists(int id)
-        //{
-        //    return _context.Employees.Any(e => e.Id == id);
-        //}
+        }              
     }
 }

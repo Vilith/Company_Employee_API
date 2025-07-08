@@ -9,8 +9,7 @@ namespace Domain.Contracts
 {
     public interface IRepositoryBase<T>
     {
-        IQueryable<T> FindAll(bool trackChanges = false);
-        //IQueryable<T> FindByCondition(Func<T, bool> expression, bool trackChanges = false);
+        IQueryable<T> FindAll(bool trackChanges = false);        
         IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges = false);
 
         void Create(T entity);

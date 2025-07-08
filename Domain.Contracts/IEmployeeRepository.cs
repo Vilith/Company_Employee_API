@@ -1,4 +1,4 @@
-﻿using Companies.API.Entities;
+﻿using Domain.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

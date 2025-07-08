@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Companies.API.Services;
 using Companies.Shared.DTOs;
+using Domain.Contracts;
 using Domain.Models.Responses;
 using Services.Contracts;
 using System;

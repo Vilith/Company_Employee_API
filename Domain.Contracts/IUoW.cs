@@ -1,6 +1,6 @@
 ﻿using Domain.Contracts;
 
-namespace Companies.API.Services
+namespace Domain.Contracts
 {
     public interface IUoW
     {

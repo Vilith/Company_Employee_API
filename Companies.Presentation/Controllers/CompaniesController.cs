@@ -1,9 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Companies.Shared.DTOs;
+using Companies.Shared.Request;
 using Services.Contracts;
+using Microsoft.AspNetCore.Identity;
+using Domain.Models.Entities;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Companies.API.Entities;
+using System.Text.Json;
+
+
 
 namespace Companies.Presentation.Controllers
 {
@@ -22,20 +29,20 @@ namespace Companies.Presentation.Controllers
 
         // GET: api/Companies
         [HttpGet]
-        [Authorize]
-        public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompany(bool includeEmployees)
+        //[Authorize]
+        public async Task<ActionResult<IEnumerable<CompanyDTO>>> GetCompany([FromQuery] CompanyRequestParams requestParams)
         {
-            var auth = User.Identity!.IsAuthenticated;
-            var userName = _userManager.GetUserName(User);
-            var user = await _userManager.GetUserAsync(User);
+            //var companyDtos = await _serviceManager.CompanyService.GetCompaniesAsync(requestParams);
+            var pagedResult = await _serviceManager.CompanyService.GetCompaniesAsync(requestParams);
 
-            var companyDtos = await _serviceManager.CompanyService.GetCompaniesAsync(includeEmployees);
-            return Ok(companyDtos);
+            Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+            return Ok(pagedResult.companyDtos);
         }             
 
         // GET: api/Companies/5
         [HttpGet("{id:int}")]
-        [Authorize]
+        //[Authorize]
         //[Authorize(Roles = "Admin")]
         //[AllowAnonymous]        
         //[Authorize(Policy = "AdminPolicy")]

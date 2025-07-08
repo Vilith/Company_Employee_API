@@ -21,15 +21,13 @@ namespace Domain.Models.Responses
             {
                 return apiOkResponse.Result;
             }
-
-            throw new InvalidOperationException($"Response type {this.GetType().Name} is not ApiOkResponse!");
+            throw new InvalidOperationException($"Response type {this.GetType().Name} is not ApiOkResponse");
         }
     }
 
     public sealed class ApiOkResponse<TResult> : ApiBaseResponse
     {
         public TResult Result { get; set; }
-
         public ApiOkResponse(TResult result) : base(true)
         {
             Result = result;
@@ -48,9 +46,9 @@ namespace Domain.Models.Responses
 
     public class CompanyNotFoundResponse : ApiNotFoundResponse
     {
-        public CompanyNotFoundResponse(int id) : base($"Company with id: {id} not found!")
+        public CompanyNotFoundResponse(int id) : base($"Company with id {id} not found.")
         {
-            
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Companies.Shared.DTOs;
+using Companies.Shared.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Services.Contracts
 {
     public interface ICompanyService
     {
-        Task<IEnumerable<CompanyDTO>> GetCompaniesAsync(bool includeEmployees, bool trackChanges = false);
+        Task<(IEnumerable<CompanyDTO> companyDtos, MetaData metaData)> GetCompaniesAsync(CompanyRequestParams requestParams, bool trackChanges = false);
         Task<CompanyDTO> GetCompanyAsync(int id, bool trackChanges = false);
     }
 }

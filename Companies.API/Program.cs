@@ -2,7 +2,6 @@
 using Companies.API.Data;
 using Companies.API.Extensions;
 using System.Reflection.Metadata;
-using Companies.API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +9,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using System.Security.Claims;
+using Domain.Models.Entities;
 
 namespace Companies.API
 {
@@ -45,8 +45,8 @@ namespace Companies.API
 
             builder.Services.ConfigureOpenApi();
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddEndpointsApiExplorer();
+            //builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
             //builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();

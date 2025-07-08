@@ -1,15 +1,16 @@
-﻿using Companies.API.Entities;
+﻿using Domain.Models.Entities;
+using Companies.Shared.Request;
 
 
-namespace Companies.API.Services
+namespace Domain.Contracts
 {
     public interface ICompanyRepository
     {
-        Task<IEnumerable<Company>> GetCompaniesAsync(bool includeEmployees = false, bool trackChanges = false);
+        Task<PagedList<Company>> GetCompaniesAsync(CompanyRequestParams requestParams, bool trackChanges = false);
         Task<Company?> GetCompanyAsync(int id, bool trackChanges = false);
+
         void Create(Company company);
-        void Delete(Company company);
-        void Update(Company company);
+        void Delete(Company company);        
 
         Task<bool> CompanyExistAsync(int id);
     }

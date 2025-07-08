@@ -1,9 +1,10 @@
 ﻿using Companies.API.Data;
-using Companies.API.Entities;
-using Companies.Infrastructure.Repositories;
+using Domain.Models.Entities;
+using Companies.Shared.Request;
 using Microsoft.EntityFrameworkCore;
+using Domain.Contracts;
 
-namespace Companies.API.Services
+namespace Companies.Infrastructure.Repositories
 {
     public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     {
@@ -21,12 +22,17 @@ namespace Companies.API.Services
 
         }
 
-        public async Task<IEnumerable<Company>> GetCompaniesAsync(bool includeEmployees = false, bool trackChanges = false)
+        public async Task<PagedList<Company>> GetCompaniesAsync(CompanyRequestParams requestParams, bool trackChanges = false)
         {
             //return includeEmployees ? await _context.Companies.Include(c => c.Employees).ToListAsync()
             //: await _context.Companies.ToListAsync();
-            return includeEmployees ? await FindAll(trackChanges).Include(c => c.Employees).ToListAsync()
-                                    : await FindAll(trackChanges).ToListAsync();
+            //return includeEmployees ? await FindAll(trackChanges).Include(c => c.Employees).ToListAsync()
+            //: await FindAll(trackChanges).ToListAsync();
+
+            var companies = requestParams.IncludeEmployees ? FindAll(trackChanges).Include(c => c.Employees)
+                                                           : FindAll(trackChanges);
+
+            return await PagedList<Company>.CreateAsync(companies, requestParams.PageNumber, requestParams.PageSize);
 
         }
 

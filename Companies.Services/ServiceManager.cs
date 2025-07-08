@@ -1,12 +1,10 @@
-﻿using Companies.API.Services;
-using Companies.Shared.DTOs;
-using Companies.API.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Domain.Contracts;
 using Services.Contracts;
 
 namespace Companies.Services
@@ -16,6 +14,7 @@ namespace Companies.Services
         private readonly Lazy<ICompanyService> companyService;
         private readonly Lazy<IEmployeeService> employeeService;
         private readonly Lazy<IAuthService> authService;
+
         public ICompanyService CompanyService => companyService.Value;
         public IEmployeeService EmployeeService => employeeService.Value;
         public IAuthService AuthService => authService.Value;

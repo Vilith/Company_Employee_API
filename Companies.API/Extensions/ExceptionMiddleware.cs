@@ -18,18 +18,18 @@ namespace Companies.API.Extensions
                     if (contextFeatures != null)
                     {
                         var problemDetailsFactory = app.Services.GetService<ProblemDetailsFactory>();
-                        ArgumentNullException.ThrowIfNull(nameof(ProblemDetailsFactory));
+                        ArgumentNullException.ThrowIfNull(nameof(problemDetailsFactory));
 
-                        var problemDetails = CreatedProblemDetails(context, contextFeatures.Error, problemDetailsFactory, app);
+                        var problemDetails = CreateProblemDetails(context, contextFeatures.Error, problemDetailsFactory, app);
 
-                        context.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError; 
+                        context.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
                         await context.Response.WriteAsJsonAsync(problemDetails);
                     }
                 });
             });
         }
 
-        private static ProblemDetails CreatedProblemDetails(HttpContext context, Exception error, ProblemDetailsFactory? problemDetailsFactory, WebApplication app)
+        private static ProblemDetails CreateProblemDetails(HttpContext context, Exception error, ProblemDetailsFactory? problemDetailsFactory, WebApplication app)
         {
             return error switch
             {
@@ -44,8 +44,7 @@ namespace Companies.API.Extensions
                     context,
                     StatusCodes.Status500InternalServerError,
                     title: "Internal Server Error",
-                    detail: app.Environment.IsDevelopment() ? error.Message : "An Unexpected error occurred")
-
+                    detail: app.Environment.IsDevelopment() ? error.Message : "Un unexpected error occured.")
             };
         }
     }

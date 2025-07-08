@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Companies.API.Entities;
+using Domain.Models.Entities;
 using Companies.Shared.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;

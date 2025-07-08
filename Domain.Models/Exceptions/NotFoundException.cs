@@ -10,26 +10,25 @@ namespace Domain.Models.Exceptions
     {
         public string Title { get; set; }
 
-        protected NotFoundException(string message, string title = "Not Found") : base(message) 
+        protected NotFoundException(string message, string title = "Not found") : base(message)
         {
             Title = title;
-            
         }
     }
 
     public class CompanyNotFoundException : NotFoundException
     {
-        public CompanyNotFoundException(int id) : base($"The Company with id: {id} was not found")
+        public CompanyNotFoundException(int id) : base($"The company with id {id} is not found")
         {
-            
+
         }
     }
 
     public class EmployeeNotFoundException : NotFoundException
     {
-        public EmployeeNotFoundException(int id) : base($"The Employee with id: {id} was not found")
+        public EmployeeNotFoundException(int id) : base($"The employee with id {id} is not found")
         {
-            
+
         }
     }
 }
