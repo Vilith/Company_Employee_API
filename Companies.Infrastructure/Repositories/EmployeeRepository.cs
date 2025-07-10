@@ -1,5 +1,6 @@
 ﻿using Companies.API.Data;
-using Companies.API.Entities;
+
+using Domain.Models.Entities;
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System;
