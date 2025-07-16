@@ -12,5 +12,6 @@ namespace Services.Contracts
     {
         Task<(IEnumerable<CompanyDTO> companyDtos, MetaData metaData)> GetCompaniesAsync(CompanyRequestParams requestParams, bool trackChanges = false);
         Task<CompanyDTO> GetCompanyAsync(int id, bool trackChanges = false);
+        Task<CompanyDTO> PostAsync(CreateCompanyDTO dto);
     }
 }

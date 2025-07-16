@@ -62,7 +62,7 @@ namespace Companies.Presentation.Controllers
         //    {
         //        return BadRequest();
         //    }
-            
+
         //    var existingCompany = await _uoW.CompanyRepository.GetCompanyAsync(id, trackChanges: true);
         //    if (existingCompany == null)
         //    {
@@ -75,20 +75,21 @@ namespace Companies.Presentation.Controllers
         //    return NoContent();
         //}
 
-        //// POST: api/Companies
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
-        //{
-        //    var company = _mapper.Map<Company>(dto);
-                        
-        //    _uoW.CompanyRepository.Create(company);
-        //    await _uoW.CompleteAsync();
+        // POST: api/Companies
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<CompanyDTO>> PostCompany(CreateCompanyDTO dto)
+        {
+            //var company = _mapper.Map<Company>(dto);
 
-        //    var createdCompany = _mapper.Map<CompanyDTO>(company);
+            //_uoW.CompanyRepository.Create(company);
+            //await _uoW.CompleteAsync();
 
-        //    return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, createdCompany);
-        //}
+            //var createdCompany = _mapper.Map<CompanyDTO>(company);
+            var createdCompany = await _serviceManager.CompanyService.PostAsync(dto);
+
+            return CreatedAtAction(nameof(GetCompany), new { id = createdCompany.Id }, createdCompany);
+        }
 
         //// DELETE: api/Companies/5
         //[HttpDelete("{id}")]

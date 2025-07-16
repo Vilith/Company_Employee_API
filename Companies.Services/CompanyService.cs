@@ -49,6 +49,14 @@ namespace Companies.Services
 
             return _mapper.Map<CompanyDTO>(company);
         }
+
+        public async Task<CompanyDTO> PostAsync(CreateCompanyDTO dto)
+        {
+            var company = _mapper.Map<Company>(dto);
+            _uow.CompanyRepository.Create(company);
+            await _uow.CompleteAsync();
+            return _mapper.Map<CompanyDTO>(company);
+        }
     }
 }
 
