@@ -22,7 +22,7 @@ namespace Companies.Infrastructure.Repositories
             return await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges).ToListAsync();            
         }
 
-        public async Task<ApplicationUser?> GetEmployeeAsync(int companyId, int employeeId, bool trackChanges = false)
+        public async Task<ApplicationUser?> GetEmployeeAsync(int companyId, string employeeId, bool trackChanges = false)
         {
             return await FindByCondition(e => e.Id.Equals(employeeId) && e.CompanyId.Equals(companyId), trackChanges).FirstOrDefaultAsync();
         }

@@ -1,3 +1,5 @@
+using Companies.Client.Clients;
+
 namespace Companies.Client
 {
     public class Program
@@ -8,6 +10,22 @@ namespace Companies.Client
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Version 1 :
+            builder.Services.AddHttpClient();
+
+            // Version 2 :
+            builder.Services.AddHttpClient("CompaniesClient", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7249/");
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            });
+
+            // Version 3 :
+            builder.Services.AddHttpClient<ICompaniesClient, CompaniesClient>();
+
+
+
 
             var app = builder.Build();
 

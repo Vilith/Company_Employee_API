@@ -109,7 +109,7 @@ namespace Companies.Presentation.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id, int companyId)
+        public async Task<IActionResult> DeleteEmployee(string id, int companyId)
         {            
             var companyExists = await _uow.CompanyRepository.CompanyExistAsync(companyId);
             if (!companyExists)
@@ -132,7 +132,7 @@ namespace Companies.Presentation.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        public async Task<ActionResult> PatchEmployee(int id, int companyId, JsonPatchDocument<UpdateEmployeeDTO> patchDocument)
+        public async Task<ActionResult> PatchEmployee(int companyId, string id, JsonPatchDocument<UpdateEmployeeDTO> patchDocument)
         {
             if (patchDocument == null) return BadRequest("No patchdocument");
                         
