@@ -26,7 +26,7 @@ namespace Companies.API
 
             builder.Services.AddControllers(configure =>
             {
-                //configure.ReturnHttpNotAcceptable = true;
+                configure.ReturnHttpNotAcceptable = true;
                 //// Everyone has to be Admins
                 //var policy = new AuthorizationPolicyBuilder()
                 //            .RequireAuthenticatedUser()
@@ -145,7 +145,9 @@ namespace Companies.API
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                await app.SeedDataAsync(); // Seed the database with initial data
+
+                //Comment out SeedDataAsync when you want to test with InMemory database
+                //await app.SeedDataAsync(); // Seed the database with initial data
             }
 
             app.UseHttpsRedirection();

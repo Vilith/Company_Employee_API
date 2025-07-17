@@ -145,7 +145,7 @@ namespace Companies.Presentation.Controllers
                 return NotFound("Employee not found");
 
             var dto = _mapper.Map<UpdateEmployeeDTO>(employeeToPatch);
-            //patchDocument.ApplyTo(dto, ModelState); // This is where the dto is patched with the patchDocument
+            patchDocument.ApplyTo(dto);
             TryValidateModel(dto);
 
             if (!ModelState.IsValid)
